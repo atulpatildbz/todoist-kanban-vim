@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        path: "/todo",
+        path: "/todos",
         element: <TodoistHome />,
       },
     ],
