@@ -16,10 +16,12 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     errorElement: <ErrorPage />,
-  },
-  {
-    path: "/todo",
-    element: <TodoistHome />,
+    children: [
+      {
+        path: "/todo",
+        element: <TodoistHome />,
+      },
+    ],
   },
 ]);
 
