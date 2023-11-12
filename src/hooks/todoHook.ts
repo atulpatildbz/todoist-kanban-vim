@@ -11,12 +11,14 @@ export const useTodoList = (api: TodoistApi) => {
   });
 };
 
-export const useTodoListByParentId = (api: TodoistApi, parentId: string) => {
+export const useTodoListByParentId = (api: TodoistApi, parentId?: string) => {
   const todoListQuery = useTodoList(api);
 
   return {
     ...todoListQuery,
-    data: todoListQuery.data?.filter((todo) => todo.parentId === parentId),
+    data: todoListQuery.data?.filter((todo) =>
+      parentId ? todo.parentId === parentId : todo.parentId === null
+    ),
   };
 };
 

@@ -1,11 +1,7 @@
 import { useLoaderData } from "react-router-dom";
-import {
-  useTodoList,
-  useTodoListByParentId,
-  useTodoParentSet,
-} from "./hooks/todoHook";
 import { useContext } from "react";
 import { TodoistContext } from "./contexts/contexts";
+import { TaskKanban } from "./common/TaskKanban";
 
 interface Params {
   id: string;
@@ -19,10 +15,5 @@ export const TodoSubtask = () => {
   if (!api) {
     throw new Error("TodoistContext is null");
   }
-  const { data: todoListSubtasks, isLoading } = useTodoListByParentId(api, id);
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  return <div>{JSON.stringify(todoListSubtasks)}</div>;
+  return <TaskKanban parentId={id} />;
 };

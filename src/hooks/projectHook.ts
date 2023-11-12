@@ -10,3 +10,14 @@ export const useProjectList = (api: TodoistApi) => {
     },
   });
 };
+
+export const useProjectIdToNameMap = (api: TodoistApi) => {
+  const projectListQuery = useProjectList(api);
+  return {
+    ...projectListQuery,
+    data: projectListQuery.data?.reduce((acc, project) => {
+      acc[project.id] = project.name;
+      return acc;
+    }, {} as Record<string, string>),
+  };
+};
