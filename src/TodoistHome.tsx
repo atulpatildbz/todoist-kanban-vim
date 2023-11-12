@@ -1,8 +1,9 @@
 import { useContext } from "react";
 import { TodoistContext } from "./contexts/contexts";
 import { useProjectList } from "./hooks/projectHook";
-import { useTodoList } from "./hooks/todoHook";
+import { useTodoList, useTodoParentSet } from "./hooks/todoHook";
 import { Spinner } from "./common/Spinner";
+import { Link } from "react-router-dom";
 
 export const TodoistHome = () => {
   const api = useContext(TodoistContext);
@@ -21,6 +22,9 @@ export const TodoistHome = () => {
     isError: isTodoListError,
   } = useTodoList(api);
 
+  const { data: parentSet } = useTodoParentSet(api);
+  console.info("parentSet: ", parentSet);
+
   if (isTodoListError) {
     return <div>Error</div>;
   }
@@ -29,7 +33,6 @@ export const TodoistHome = () => {
     return <Spinner />;
   }
 
-  console.info("todoList: ", todoList);
   return (
     <div className="p-4">
       {/* {projectList.map((project) => (
@@ -41,7 +44,13 @@ export const TodoistHome = () => {
       {todoList &&
         todoList.map((todo) => (
           <div key={todo.id} className="p-2 bg-blue-100 rounded-lg mb-2">
-            {todo.content}
+            {parentSet?.has(todo.id) ? (
+              <Link to={`${todo.id}`} className="text-blue-500 hover:underline">
+                {todo.content}
+              </Link>
+            ) : (
+              <>{todo.content}</>
+            )}
           </div>
         ))}
     </div>

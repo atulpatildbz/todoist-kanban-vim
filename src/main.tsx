@@ -8,6 +8,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import { TodoistHome } from "./TodoistHome.tsx";
 import TodoistApiHOC from "./TodoistApiHOC.tsx";
+import { TodoSubtask, loader as todoSubtaskLoader } from "./TodoSubtask.tsx";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,11 @@ const router = createBrowserRouter([
       {
         path: "/todos",
         element: <TodoistHome />,
+      },
+      {
+        path: "/todos/:id",
+        element: <TodoSubtask />,
+        loader: todoSubtaskLoader,
       },
     ],
   },
