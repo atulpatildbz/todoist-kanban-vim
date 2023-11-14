@@ -29,6 +29,7 @@ const INDEX_TO_LABEL_MAP = [
 ];
 
 type Direction = "left" | "right";
+const columnNames = ["Not Set", "Todo", "Blocked", "In Progress", "Done"];
 
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -111,21 +112,14 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
       <table className="table-auto w-full border-2 border-gray-200 bg-gray-300">
         <thead>
           <tr>
-            <th className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200">
-              Not Set
-            </th>
-            <th className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200">
-              Todo
-            </th>
-            <th className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200">
-              Blocked
-            </th>
-            <th className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200">
-              In Progress
-            </th>
-            <th className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200">
-              Done
-            </th>
+            {columnNames.map((name, index) => (
+              <th
+                key={index}
+                className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200"
+              >
+                {name}
+              </th>
+            ))}
           </tr>
         </thead>
       </table>
