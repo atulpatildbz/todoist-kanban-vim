@@ -159,10 +159,27 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                         ) : (
                           <>{task.content}</>
                         )}
+                        <a
+                          href={task.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ display: "inline-block", marginLeft: "5px" }}
+                        >
+                          <img
+                            src="/open-icon.svg"
+                            alt="Open"
+                            style={{ width: "10px", height: "10px" }}
+                          />
+                        </a>
                       </Text>
                       <Text as="div" size="2" color="gray">
                         {projectIdToNameMap?.[task.projectId]}
                       </Text>
+                      {task.due && (
+                        <Text as="div" size="2" color="gray">
+                          {task.due.string}
+                        </Text>
+                      )}
                     </Box>
                   </Flex>
                 </Card>
