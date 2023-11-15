@@ -33,6 +33,10 @@ const columnNames = ["Not Set", "Todo", "Blocked", "In Progress", "Done"];
 
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [searchText, setSearchText] = useState<string | null>(null);
+  const [searchResultIndex, setSearchResultIndex] = useState<number | null>(
+    null
+  );
   const api = useContext(TodoistContext);
   if (!api) {
     throw new Error("TodoistContext is null");
@@ -65,6 +69,30 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
 
     return cols;
   }, [todoListSubtasks]);
+
+  const eligibleTasks = useMemo(() => {
+    if (!searchText || !todoListSubtasks) return [];
+    return todoListSubtasks
+      ?.filter((task) => task.content.includes(searchText))
+      .sort((a, b) => {
+        const labelOrder = [
+          "",
+          KANBAN_TODO,
+          KANBAN_BLOCKED,
+          KANBAN_IN_PROGRESS,
+          KANBAN_DONE,
+        ];
+        const aLabel = a.labels[0] || "";
+        const bLabel = b.labels[0] || "";
+        return labelOrder.indexOf(aLabel) - labelOrder.indexOf(bLabel);
+      });
+  }, [todoListSubtasks, searchText]);
+
+  if (eligibleTasks.length && searchResultIndex !== null) {
+    if (selectedTaskId !== eligibleTasks[searchResultIndex].id) {
+      setSelectedTaskId(eligibleTasks[searchResultIndex].id);
+    }
+  }
 
   const setNewKanbanIndex = useCallback(
     (newLabelIndex: number) => {
@@ -109,13 +137,35 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         moveCard("left");
       } else if (event.key === "l" || event.key === "ArrowRight") {
         moveCard("right");
+      } else if (event.key === "/") {
+        setSearchText(prompt("Enter text:"));
+        setSearchResultIndex(0);
+      } else if (event.key === "Escape") {
+        setSearchText(null);
+        setSelectedTaskId(null);
+      } else if (searchResultIndex !== null) {
+        if (event.key === "n") {
+          setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
+        } else if (event.key === "N") {
+          setSearchResultIndex(
+            (searchResultIndex - 1 + eligibleTasks.length) %
+              eligibleTasks.length
+          );
+        }
       }
     };
     window.addEventListener("keydown", handleKeyPress);
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [selectedTaskId, moveCard]);
+  }, [
+    selectedTaskId,
+    moveCard,
+    searchResultIndex,
+    setSearchText,
+    setSearchResultIndex,
+    eligibleTasks,
+  ]);
 
   if (isLoading || isLoadingProject) {
     return <div>Loading...</div>;
@@ -152,6 +202,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                   variant="classic"
                   onClick={() => {
                     setSelectedTaskId(task.id);
+                    setSearchResultIndex(null);
                   }}
                 >
                   <Flex gap="3" align="center">
