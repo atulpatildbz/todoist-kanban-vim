@@ -176,9 +176,11 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   ]);
 
   useEffect(() => {
-    const selectedTaskRef = taskRefs.get(selectedTaskId);
-    selectedTaskRef?.scrollIntoView({ behavior: "smooth" });
-  }, [selectedTaskId, taskRefs]);
+    if (searchText && searchResultIndex !== null) {
+      const selectedTaskRef = taskRefs.get(selectedTaskId);
+      selectedTaskRef?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedTaskId, taskRefs, searchText, searchResultIndex]);
 
   if (isLoading || isLoadingProject) {
     return <div>Loading...</div>;
