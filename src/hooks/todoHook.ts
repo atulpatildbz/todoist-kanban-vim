@@ -49,6 +49,30 @@ export const useCreateTodo = (api: TodoistApi) => {
   });
 };
 
+export const useDeleteTodo = (api: TodoistApi) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: Task["id"]) => {
+      return api.deleteTask(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TODO_KEY] });
+    },
+  });
+};
+
+export const useCloseTask = (api: TodoistApi) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: Task["id"]) => {
+      return api.closeTask(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TODO_KEY] });
+    },
+  });
+};
+
 export const useTodoListByParentId = (api: TodoistApi, parentId?: string) => {
   const todoListQuery = useTodoList(api);
 

@@ -8,7 +8,9 @@ import {
 } from "react";
 import { TodoistContext } from "../contexts/contexts";
 import {
+  useCloseTask,
   useCreateTodo,
+  useDeleteTodo,
   useTodoListByParentId,
   useTodoParentSet,
   useUpdateTodo,
@@ -56,6 +58,8 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   );
   const updateTodo = useUpdateTodo(api);
   const createTodo = useCreateTodo(api);
+  const closeTodo = useCloseTask(api);
+  const deleteTodo = useDeleteTodo(api);
 
   const { data: todoParentSet } = useTodoParentSet(api);
   const { data: projectIdToNameMap, isLoading: isLoadingProject } =
@@ -158,6 +162,12 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         if (newTaskContent) {
           createTodo.mutate({ content: newTaskContent, parentId });
         }
+      } else if (event.key === "x" && selectedTaskId) {
+        deleteTodo.mutate(selectedTaskId);
+        setSelectedTaskId(null);
+      } else if (event.key === "c" && selectedTaskId) {
+        closeTodo.mutate(selectedTaskId);
+        setSelectedTaskId(null);
       } else if (searchResultIndex !== null) {
         if (event.key === "n") {
           setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
@@ -182,6 +192,8 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     eligibleTasks,
     parentId,
     createTodo,
+    deleteTodo,
+    closeTodo,
   ]);
 
   useEffect(() => {
