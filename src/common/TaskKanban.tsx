@@ -51,13 +51,15 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     const cols: string[][] = [[], [], [], [], []];
 
     todoListSubtasks?.forEach((task) => {
-      let columnIndex = NO_LABEL;
-      if (task.labels.includes(KANBAN_TODO)) columnIndex = TODO;
-      else if (task.labels.includes(KANBAN_BLOCKED)) columnIndex = BLOCKED;
-      else if (task.labels.includes(KANBAN_IN_PROGRESS))
-        columnIndex = IN_PROGRESS;
-      else if (task.labels.includes(KANBAN_DONE)) columnIndex = DONE;
-
+      const columnIndex = task.labels.includes(KANBAN_TODO)
+        ? TODO
+        : task.labels.includes(KANBAN_BLOCKED)
+        ? BLOCKED
+        : task.labels.includes(KANBAN_IN_PROGRESS)
+        ? IN_PROGRESS
+        : task.labels.includes(KANBAN_DONE)
+        ? DONE
+        : NO_LABEL;
       cols[columnIndex].push(task.id);
     });
 
@@ -71,16 +73,20 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         column.includes(selectedTaskId)
       );
       if (columnIndex === -1) return;
-      let newLabelIndex = columnIndex;
-      if (direction === "left" && columnIndex > 0) {
-        newLabelIndex = columnIndex - 1;
-      } else if (
-        direction === "right" &&
-        columnIndex < INDEX_TO_LABEL_MAP.length - 1
-      ) {
-        newLabelIndex = columnIndex + 1;
-      }
+
+      const isLeft = direction === "left";
+      const isRight = direction === "right";
+      const canMoveLeft = isLeft && columnIndex > 0;
+      const canMoveRight =
+        isRight && columnIndex < INDEX_TO_LABEL_MAP.length - 1;
+
+      const newLabelIndex = canMoveLeft
+        ? columnIndex - 1
+        : canMoveRight
+        ? columnIndex + 1
+        : columnIndex;
       const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
+
       updateTodo.mutate({
         id: selectedTaskId,
         data: { labels: newLabel === "" ? [] : [newLabel] },
