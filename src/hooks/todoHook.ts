@@ -37,6 +37,18 @@ export const useUpdateTodo = (api: TodoistApi) => {
   });
 };
 
+export const useCreateTodo = (api: TodoistApi) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Partial<Task>) => {
+      return api.addTask(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [TODO_KEY] });
+    },
+  });
+};
+
 export const useTodoListByParentId = (api: TodoistApi, parentId?: string) => {
   const todoListQuery = useTodoList(api);
 

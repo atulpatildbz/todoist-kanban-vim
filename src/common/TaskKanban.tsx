@@ -8,6 +8,7 @@ import {
 } from "react";
 import { TodoistContext } from "../contexts/contexts";
 import {
+  useCreateTodo,
   useTodoListByParentId,
   useTodoParentSet,
   useUpdateTodo,
@@ -54,6 +55,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     parentId
   );
   const updateTodo = useUpdateTodo(api);
+  const createTodo = useCreateTodo(api);
 
   const { data: todoParentSet } = useTodoParentSet(api);
   const { data: projectIdToNameMap, isLoading: isLoadingProject } =
@@ -151,6 +153,11 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
       } else if (event.key === "Escape") {
         setSearchText(null);
         setSelectedTaskId(null);
+      } else if (event.key === "o") {
+        const newTaskContent = prompt("Enter content for new task:");
+        if (newTaskContent) {
+          createTodo.mutate({ content: newTaskContent, parentId });
+        }
       } else if (searchResultIndex !== null) {
         if (event.key === "n") {
           setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
@@ -173,6 +180,8 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     setSearchText,
     setSearchResultIndex,
     eligibleTasks,
+    parentId,
+    createTodo,
   ]);
 
   useEffect(() => {
