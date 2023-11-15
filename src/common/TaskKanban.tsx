@@ -66,6 +66,18 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     return cols;
   }, [todoListSubtasks]);
 
+  const setNewKanbanIndex = useCallback(
+    (newLabelIndex: number) => {
+      if (selectedTaskId === null) return;
+      const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
+      updateTodo.mutate({
+        id: selectedTaskId,
+        data: { labels: newLabel === "" ? [] : [newLabel] },
+      });
+    },
+    [selectedTaskId, updateTodo]
+  );
+
   const moveCard = useCallback(
     (direction: Direction) => {
       if (!selectedTaskId) return;
@@ -85,14 +97,10 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         : canMoveRight
         ? columnIndex + 1
         : columnIndex;
-      const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
 
-      updateTodo.mutate({
-        id: selectedTaskId,
-        data: { labels: newLabel === "" ? [] : [newLabel] },
-      });
+      setNewKanbanIndex(newLabelIndex);
     },
-    [selectedTaskId, columns, updateTodo]
+    [selectedTaskId, columns, setNewKanbanIndex]
   );
 
   useEffect(() => {
