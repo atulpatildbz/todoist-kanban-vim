@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { TodoistContext } from "../contexts/contexts";
 import {
   useTodoListByParentId,
@@ -32,6 +39,7 @@ type Direction = "left" | "right";
 const columnNames = ["Not Set", "Todo", "Blocked", "In Progress", "Done"];
 
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
+  const taskRefs = useRef(new Map()).current;
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string | null>(null);
   const [searchResultIndex, setSearchResultIndex] = useState<number | null>(
@@ -167,6 +175,11 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     eligibleTasks,
   ]);
 
+  useEffect(() => {
+    const selectedTaskRef = taskRefs.get(selectedTaskId);
+    selectedTaskRef?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedTaskId, taskRefs]);
+
   if (isLoading || isLoadingProject) {
     return <div>Loading...</div>;
   }
@@ -194,6 +207,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
               const task = todoListSubtasks?.find((t) => t.id === taskId);
               return task ? (
                 <Card
+                  ref={(el) => taskRefs.set(task.id, el)}
                   className="max-w-sm "
                   style={{
                     backgroundColor: selectedTaskId === task.id ? "yellow" : "",
