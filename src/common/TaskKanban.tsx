@@ -65,10 +65,8 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const { data: projectIdToNameMap, isLoading: isLoadingProject } =
     useProjectIdToNameMap(api);
 
-  const columns = useMemo(() => {
-    const cols: string[][] = [[], [], [], [], []];
-    // Sort tasks by due date
-    const sortedTasks = [...(todoListSubtasks || [])].sort((a, b) => {
+  const sortedTasks = useMemo(() => {
+    return [...(todoListSubtasks || [])].sort((a, b) => {
       const aDate = a.due
         ? a.due.datetime
           ? new Date(a.due.datetime)
@@ -98,6 +96,10 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         );
       }
     });
+  }, [todoListSubtasks]);
+
+  const columns = useMemo(() => {
+    const cols: string[][] = [[], [], [], [], []];
 
     sortedTasks?.forEach((task) => {
       const columnIndex = task.labels.includes(KANBAN_TODO)
@@ -113,11 +115,11 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     });
 
     return cols;
-  }, [todoListSubtasks]);
+  }, [sortedTasks]);
 
   const eligibleTasks = useMemo(() => {
-    if (!searchText || !todoListSubtasks) return [];
-    return todoListSubtasks
+    if (!searchText || !sortedTasks) return [];
+    return sortedTasks
       ?.filter((task) => task.content.includes(searchText))
       .sort((a, b) => {
         const labelOrder = [
@@ -131,7 +133,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         const bLabel = b.labels[0] || "";
         return labelOrder.indexOf(aLabel) - labelOrder.indexOf(bLabel);
       });
-  }, [todoListSubtasks, searchText]);
+  }, [sortedTasks, searchText]);
 
   if (eligibleTasks.length && searchResultIndex !== null) {
     if (selectedTaskId !== eligibleTasks[searchResultIndex].id) {

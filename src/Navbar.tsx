@@ -25,7 +25,7 @@ export const Navbar = () => {
         </div>
         {(isFetchingCount > 0 || isMutatingCount > 0) && (
           <div
-            className="hidden w-full md:block md:w-auto h-6"
+            className="fixed top-0 right-0 w-full md:w-auto h-6 mt-1"
             id="navbar-default"
           >
             <div role="status">
