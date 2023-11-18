@@ -209,13 +209,13 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
 
   return (
     <>
-      <table className="table-auto w-full border-2 border-gray-200 bg-gray-300">
+      <table className="table-auto w-full bg-gray-800 text-white">
         <thead>
           <tr>
             {columnNames.map((name, index) => (
               <th
                 key={index}
-                className="px-4 py-2 text-center w-1/5 border-b-2 border-gray-200"
+                className="px-4 py-2 text-center w-1/5 border border-gray-600"
               >
                 {name}
               </th>
@@ -223,9 +223,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
           </tr>
         </thead>
       </table>
-      <div className="grid grid-cols-5 gap-4 bg-[#1E1E1E]">
+      <div className="grid grid-cols-5 bg-[#1E1E1E]">
         {columns.map((column, index) => (
-          <div key={index}>
+          <div key={index} className="mx-1">
             {column.map((taskId) => {
               const task = todoListSubtasks?.find((t) => t.id === taskId);
               return task ? (
@@ -234,6 +234,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                   className={`max-w-sm mycard ${
                     task.id === selectedTaskId ? "selected" : ""
                   }`}
+                  style={{
+                    padding: "5px",
+                  }}
                   key={task.id}
                   variant="classic"
                   onClick={() => {
