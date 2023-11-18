@@ -8,7 +8,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import { TodoistHome } from "./TodoistHome.tsx";
 import TodoistApiHOC from "./TodoistApiHOC.tsx";
-import { TodoSubtask, loader as todoSubtaskLoader } from "./TodoSubtask.tsx";
+import { TodoSubtask } from "./TodoSubtask.tsx";
+import { loader as todoSubtaskLoader } from "./todoLoader.tsx";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 
