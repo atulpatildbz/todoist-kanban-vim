@@ -58,6 +58,14 @@ export const useDeleteTodo = (api: TodoistApi) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TODO_KEY] });
     },
+    onMutate: async (id: Task["id"]) => {
+      await queryClient.cancelQueries({ queryKey: [TODO_KEY] });
+      const previousTodos = queryClient.getQueryData([TODO_KEY]);
+      queryClient.setQueryData([TODO_KEY], (todos: Task[]) => {
+        return todos.filter((todo) => todo.id !== id);
+      });
+      return { previousTodos };
+    },
   });
 };
 
