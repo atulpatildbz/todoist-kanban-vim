@@ -4,13 +4,13 @@ This is a webapp that uses Todoist's SDKs and provide a way to use kanban board 
 
 ## List of vim keybindings
 
-| Keybinding | Action                                  |
-| ---------- | --------------------------------------- |
-| `l` or `→` | Move right                              |
-| `h` or `←` | Move left                               |
-| `o`        | Create new task                         |
-| `x`        | Delete task                             |
-| `c`        | Close task                              |
-| `/`        | Search task                             |
-| `n`        | Go to next task when in search mode     |
-| `N`        | Go to previous task when in search mode |
+| Keybinding | Action                                             |
+| ---------- | -------------------------------------------------- |
+| `l` or `→` | Move right                                         |
+| `h` or `←` | Move left                                          |
+| `o`        | Create new task. use separator `\|` for due_string |
+| `x`        | Delete task                                        |
+| `c`        | Close task                                         |
+| `/`        | Search task                                        |
+| `n`        | Go to next task when in search mode                |
+| `N`        | Go to previous task when in search mode            |
