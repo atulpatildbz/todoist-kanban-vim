@@ -1,6 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+  background-color: #1E1E1E;
+}
+
+.mycard {
+  padding: 24px;
+  border: 1px solid;
+  border-radius: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  /* box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75); */
+  border-color: #3D3D3D !important;
+  background-color: #282828 !important;
+  color: white;
+}
+
+.mycard:hover {
+  box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.75);
+  /* border-#666666 */
+  border-color: #666666 !important;
+  cursor: pointer;
+}
+
+.mycard.selected {
+  background-color: #363636 !important;
+  border-color: aliceblue !important;
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

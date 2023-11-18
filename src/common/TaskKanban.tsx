@@ -223,7 +223,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
           </tr>
         </thead>
       </table>
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-4 bg-[#1E1E1E]">
         {columns.map((column, index) => (
           <div key={index}>
             {column.map((taskId) => {
@@ -231,10 +231,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
               return task ? (
                 <Card
                   ref={(el) => taskRefs.set(task.id, el)}
-                  className="max-w-sm "
-                  style={{
-                    backgroundColor: selectedTaskId === task.id ? "yellow" : "",
-                  }}
+                  className={`max-w-sm mycard ${
+                    task.id === selectedTaskId ? "selected" : ""
+                  }`}
                   key={task.id}
                   variant="classic"
                   onClick={() => {
@@ -268,13 +267,13 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                           />
                         </a>
                       </Text>
-                      <Text as="div" size="2" color="gray">
+                      <div className="text-gray-400 text-sm">
                         {projectIdToNameMap?.[task.projectId]}
-                      </Text>
+                      </div>
                       {task.due && (
-                        <Text as="div" size="2" color="gray">
+                        <div className="text-gray-400 text-sm">
                           {task.due.string}
-                        </Text>
+                        </div>
                       )}
                     </Box>
                   </Flex>
