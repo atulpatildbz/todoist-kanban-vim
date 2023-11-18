@@ -189,9 +189,16 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         setSearchText(null);
         setSelectedTaskId(null);
       } else if (event.key === "o") {
-        const newTaskContent = prompt("Enter content for new task:");
+        let newTaskContent = prompt("Enter content for new task:");
         if (newTaskContent) {
-          createTodo.mutate({ content: newTaskContent, parentId });
+          let due_string: string | undefined = undefined;
+          if (newTaskContent.includes("|")) {
+            const parts = newTaskContent.split("|");
+            newTaskContent = parts[0];
+            due_string = parts[1];
+          }
+          const createData = { content: newTaskContent, parentId, due_string };
+          createTodo.mutate(createData);
         }
       } else if (event.key === "x" && selectedTaskId) {
         deleteTodo.mutate(selectedTaskId);
