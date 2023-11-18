@@ -305,8 +305,17 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                         {projectIdToNameMap?.[task.projectId]}
                       </div>
                       {task.due && (
-                        <div className="text-gray-400 text-sm">
-                          {task.due.string}
+                        <div
+                          className={`text-sm ${
+                            new Date(task.due.datetime || task.due.date) <
+                            new Date()
+                              ? "text-red-400"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {task.due.datetime
+                            ? new Date(task.due.datetime).toLocaleString()
+                            : new Date(task.due.date).toLocaleDateString()}
                         </div>
                       )}
                     </Box>
