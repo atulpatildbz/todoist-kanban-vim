@@ -67,8 +67,39 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
 
   const columns = useMemo(() => {
     const cols: string[][] = [[], [], [], [], []];
+    // Sort tasks by due date
+    const sortedTasks = [...(todoListSubtasks || [])].sort((a, b) => {
+      const aDate = a.due
+        ? a.due.datetime
+          ? new Date(a.due.datetime)
+          : a.due.date
+          ? new Date(a.due.date)
+          : Infinity
+        : Infinity;
+      const bDate = b.due
+        ? b.due.datetime
+          ? new Date(b.due.datetime)
+          : b.due.date
+          ? new Date(b.due.date)
+          : Infinity
+        : Infinity;
 
-    todoListSubtasks?.forEach((task) => {
+      const aHasDateTime = a.due && a.due.datetime;
+      const bHasDateTime = b.due && b.due.datetime;
+
+      if (aHasDateTime && !bHasDateTime) {
+        return -1;
+      } else if (!aHasDateTime && bHasDateTime) {
+        return 1;
+      } else {
+        return (
+          (aDate instanceof Date ? aDate.getTime() : aDate) -
+          (bDate instanceof Date ? bDate.getTime() : bDate)
+        );
+      }
+    });
+
+    sortedTasks?.forEach((task) => {
       const columnIndex = task.labels.includes(KANBAN_TODO)
         ? TODO
         : task.labels.includes(KANBAN_BLOCKED)
@@ -274,8 +305,17 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                         {projectIdToNameMap?.[task.projectId]}
                       </div>
                       {task.due && (
-                        <div className="text-gray-400 text-sm">
-                          {task.due.string}
+                        <div
+                          className={`text-sm ${
+                            new Date(task.due.datetime || task.due.date) <
+                            new Date()
+                              ? "text-red-400"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {task.due.datetime
+                            ? new Date(task.due.datetime).toLocaleString()
+                            : new Date(task.due.date).toLocaleDateString()}
                         </div>
                       )}
                     </Box>
