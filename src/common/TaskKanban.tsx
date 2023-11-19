@@ -219,6 +219,10 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         setSelectedTaskId(null);
       } else if (event.key === "d" && previousKey === "g") {
         navigate(`/todos/${selectedTaskId}`);
+      } else if (event.key === "H") {
+        navigate(-1);
+      } else if (event.key === "L") {
+        navigate(1);
       } else if (searchResultIndex !== null) {
         if (event.key === "n") {
           setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
