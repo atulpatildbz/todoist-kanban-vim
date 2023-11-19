@@ -223,6 +223,18 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         navigate(-1);
       } else if (event.key === "L") {
         navigate(1);
+      } else if (event.key === "g" && previousKey === "g") {
+        window.scrollTo(0, 0);
+      } else if (event.key === "G") {
+        window.scrollTo(0, document.body.scrollHeight);
+      } else if (event.ctrlKey && event.key === "d") {
+        window.scrollBy(0, window.innerHeight);
+      } else if (event.ctrlKey && event.key === "u") {
+        window.scrollBy(0, -window.innerHeight);
+      } else if (event.key === "j") {
+        window.scrollBy(0, window.innerHeight / 2.5);
+      } else if (event.key === "k") {
+        window.scrollBy(0, -window.innerHeight / 2.5);
       } else if (searchResultIndex !== null) {
         if (event.key === "n") {
           setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
