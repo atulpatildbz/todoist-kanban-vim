@@ -15,7 +15,7 @@ import {
   useTodoParentSet,
   useUpdateTodo,
 } from "../hooks/todoHook";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useProjectIdToNameMap } from "../hooks/projectHook";
 import { Box, Card, Flex, Text } from "@radix-ui/themes";
 
@@ -41,7 +41,11 @@ const INDEX_TO_LABEL_MAP = [
 type Direction = "left" | "right";
 const columnNames = ["Not Set", "Todo", "Blocked", "In Progress", "Done"];
 
+let previousKey: string | null = null;
+
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
+  const navigate = useNavigate();
+
   const taskRefs = useRef(new Map()).current;
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [searchText, setSearchText] = useState<string | null>(null);
@@ -213,6 +217,8 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
       } else if (event.key === "c" && selectedTaskId) {
         closeTodo.mutate(selectedTaskId);
         setSelectedTaskId(null);
+      } else if (event.key === "d" && previousKey === "g") {
+        navigate(`/todos/${selectedTaskId}`);
       } else if (searchResultIndex !== null) {
         if (event.key === "n") {
           setSearchResultIndex((searchResultIndex + 1) % eligibleTasks.length);
@@ -223,6 +229,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
           );
         }
       }
+      previousKey = event.key;
     };
     window.addEventListener("keydown", handleKeyPress);
     return () => {
@@ -239,6 +246,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     createTodo,
     deleteTodo,
     closeTodo,
+    navigate,
   ]);
 
   useEffect(() => {
