@@ -120,7 +120,12 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const eligibleTasks = useMemo(() => {
     if (!searchText || !sortedTasks) return [];
     return sortedTasks
-      ?.filter((task) => task.content.includes(searchText))
+      ?.filter((task) => {
+        if (searchText === searchText.toLowerCase()) {
+          return task.content.toLowerCase().includes(searchText);
+        }
+        return task.content.includes(searchText);
+      })
       .sort((a, b) => {
         const labelOrder = [
           "",
