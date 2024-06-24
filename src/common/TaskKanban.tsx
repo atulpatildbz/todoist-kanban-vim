@@ -373,7 +373,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                           style={{ display: "inline-block", marginLeft: "5px" }}
                         >
                           <img
-                            src="/open-icon.svg"
+                            src="/todoist-kanban-vim/open-icon.svg"
                             alt="Open"
                             style={{ width: "10px", height: "10px" }}
                           />
