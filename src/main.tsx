@@ -15,24 +15,29 @@ import { Theme } from "@radix-ui/themes";
 
 const queryClient = new QueryClient();
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <App />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: "/todos",
+          element: <TodoistHome />,
+        },
+        {
+          path: "/todos/:id",
+          element: <TodoSubtask />,
+          loader: todoSubtaskLoader,
+        },
+      ],
+    },
+  ],
   {
-    path: "/",
-    element: <App />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "/todos",
-        element: <TodoistHome />,
-      },
-      {
-        path: "/todos/:id",
-        element: <TodoSubtask />,
-        loader: todoSubtaskLoader,
-      },
-    ],
-  },
-]);
+    basename: "/todoist-kanban-vim/",
+  }
+);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
