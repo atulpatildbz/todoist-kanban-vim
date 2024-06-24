@@ -21,19 +21,6 @@ export const useUpdateTodo = (api: TodoistApi) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TODO_KEY] });
     },
-    onMutate: async ({ id, data }: { id: Task["id"]; data: Partial<Task> }) => {
-      await queryClient.cancelQueries({ queryKey: [TODO_KEY] });
-      const previousTodos = queryClient.getQueryData([TODO_KEY]);
-      queryClient.setQueryData([TODO_KEY], (todos: Task[]) => {
-        return todos.map((todo) => {
-          if (todo.id === id) {
-            return { ...todo, ...data };
-          }
-          return todo;
-        });
-      });
-      return { previousTodos };
-    },
   });
 };
 

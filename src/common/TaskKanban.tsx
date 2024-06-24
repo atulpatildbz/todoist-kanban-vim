@@ -18,6 +18,9 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useProjectIdToNameMap } from "../hooks/projectHook";
 import { Box, Card, Flex, Text } from "@radix-ui/themes";
+import { useQueryClient } from "@tanstack/react-query";
+import { TODO_KEY } from "../constants/queryKeys";
+import { Task } from "@doist/todoist-api-typescript";
 
 const KANBAN_TODO = "KANBAN_TODO";
 const KANBAN_BLOCKED = "KANBAN_BLOCKED";
@@ -45,6 +48,7 @@ let previousKey: string | null = null;
 
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const taskRefs = useRef(new Map()).current;
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -150,16 +154,52 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     }
   }
 
-  const setNewKanbanIndex = useCallback(
-    (newLabelIndex: number) => {
-      if (selectedTaskId === null) return;
-      const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const useDebounce = (callback: (...args: any[]) => void, delay: number) => {
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const debouncedFunction = (...args: any[]) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        callback(...args);
+      }, delay);
+    };
+
+    return debouncedFunction;
+  };
+
+  const debouncedMutate = useDebounce(
+    (selectedTaskId: string, newLabel: string) => {
       updateTodo.mutate({
         id: selectedTaskId,
         data: { labels: newLabel === "" ? [] : [newLabel] },
       });
     },
-    [selectedTaskId, updateTodo]
+    300
+  );
+
+  const setNewKanbanIndex = useCallback(
+    (newLabelIndex: number) => {
+      if (selectedTaskId === null) return;
+      const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
+
+      // Immediately set the query data
+      queryClient.setQueryData([TODO_KEY], (todos: Task[]) => {
+        return todos.map((todo) => {
+          if (todo.id === selectedTaskId) {
+            return { ...todo, labels: newLabel === "" ? [] : [newLabel] };
+          }
+          return todo;
+        });
+      });
+
+      // Debounced mutate call
+      debouncedMutate(selectedTaskId, newLabel);
+    },
+    [selectedTaskId, queryClient, debouncedMutate]
   );
 
   const moveCard = useCallback(
