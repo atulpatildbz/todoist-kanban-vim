@@ -23,6 +23,10 @@ const router = createBrowserRouter(
       errorElement: <ErrorPage />,
       children: [
         {
+          index: true,
+          element: <TodoistHome />,
+        },
+        {
           path: "/todos",
           element: <TodoistHome />,
         },
