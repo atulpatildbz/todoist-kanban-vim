@@ -36,7 +36,10 @@ jobs:
         with:
           bun-version: latest
       - name: Install dependencies
-        run: bun install
+        run: |
+          for i in {1..5}; do
+            bun install && break || sleep 15;
+          done
       - name: Build
         run: bun run build
       - name: Setup Pages
@@ -44,7 +47,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
+          path: "./dist"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
