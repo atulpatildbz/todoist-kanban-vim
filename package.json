@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "@doist/todoist-api-typescript": "^3.0.3",
-    "@radix-ui/themes": "^2.0.0",
     "@tanstack/react-query": "^5.8.1",
     "@tanstack/react-query-devtools": "^5.8.2",
     "@types/react-router-dom": "^5.3.3",

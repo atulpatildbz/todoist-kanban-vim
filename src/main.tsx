@@ -10,8 +10,6 @@ import { TodoistHome } from "./TodoistHome.tsx";
 import TodoistApiHOC from "./TodoistApiHOC.tsx";
 import { TodoSubtask } from "./TodoSubtask.tsx";
 import { loader as todoSubtaskLoader } from "./todoLoader.tsx";
-import "@radix-ui/themes/styles.css";
-import { Theme } from "@radix-ui/themes";
 
 const queryClient = new QueryClient();
 
@@ -45,13 +43,11 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Theme>
-      <QueryClientProvider client={queryClient}>
-        <TodoistApiHOC>
-          <RouterProvider router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
-        </TodoistApiHOC>
-      </QueryClientProvider>
-    </Theme>
+    <QueryClientProvider client={queryClient}>
+      <TodoistApiHOC>
+        <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </TodoistApiHOC>
+    </QueryClientProvider>
   </React.StrictMode>
 );
