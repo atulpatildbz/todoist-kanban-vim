@@ -408,7 +408,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                   <h3 className="text-lg font-semibold mb-2 text-white">
                     {todoParentSet?.has(task.id) ? (
                       <Link
-                        to={`${task.id}`}
+                        to={`todos/${task.id}`}
                         className="text-blue-300 hover:text-blue-200 transition-colors duration-200"
                       >
                         {task.content}
