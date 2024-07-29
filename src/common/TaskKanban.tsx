@@ -17,7 +17,6 @@ import {
 } from "../hooks/todoHook";
 import { Link, useNavigate } from "react-router-dom";
 import { useProjectIdToNameMap } from "../hooks/projectHook";
-import { Card, Flex, Text } from "@radix-ui/themes";
 import { useQueryClient } from "@tanstack/react-query";
 import { TODO_KEY } from "../constants/queryKeys";
 import { Task } from "@doist/todoist-api-typescript";
@@ -73,6 +72,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const { data: projectIdToNameMap, isLoading: isLoadingProject } =
     useProjectIdToNameMap(api);
 
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [selectedDueDates, setSelectedDueDates] = useState<string[]>([]);
+
   const sortedTasks = useMemo(() => {
     return [...(todoListSubtasks || [])].sort((a, b) => {
       const aDate = a.due
@@ -106,10 +108,39 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     });
   }, [todoListSubtasks]);
 
+  const filteredTasks = useMemo(() => {
+    return sortedTasks?.filter((task) => {
+      const projectFilter =
+        selectedProjects.length === 0 ||
+        selectedProjects.includes(task.projectId);
+
+      const dueDateFilter =
+        selectedDueDates.length === 0 ||
+        selectedDueDates.some((filter) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const taskDueDate = task.due
+            ? new Date(task.due.datetime || task.due.date)
+            : null;
+
+          if (filter === "today" && taskDueDate) {
+            return taskDueDate.toDateString() === today.toDateString();
+          } else if (filter === "today_and_past" && taskDueDate) {
+            return taskDueDate <= today;
+          } else if (filter === "all" && taskDueDate) {
+            return true;
+          }
+          return false;
+        });
+
+      return projectFilter && dueDateFilter;
+    });
+  }, [sortedTasks, selectedProjects, selectedDueDates]);
+
   const columns = useMemo(() => {
     const cols: string[][] = [[], [], [], [], []];
 
-    sortedTasks?.forEach((task) => {
+    filteredTasks?.forEach((task) => {
       const columnIndex = task.labels.includes(KANBAN_TODO)
         ? TODO
         : task.labels.includes(KANBAN_BLOCKED)
@@ -123,7 +154,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     });
 
     return cols;
-  }, [sortedTasks]);
+  }, [filteredTasks]);
 
   const eligibleTasks = useMemo(() => {
     if (!searchText || !sortedTasks) return [];
@@ -317,100 +348,110 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   }
 
   return (
-    <>
-      <table className="table-auto w-full bg-gray-800 text-white">
-        <thead>
-          <tr>
-            {columnNames.map((name, index) => (
-              <th
-                key={index}
-                className="px-4 py-2 text-center w-1/5 border border-gray-600"
-              >
-                {name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-      </table>
-      <div className="grid grid-cols-5 bg-[#1E1E1E]">
+    <div className="bg-gray-900">
+      <div className="mb-4 flex space-x-4">
+        <select
+          className="bg-gray-800 text-white p-2 rounded w-48"
+          value={selectedProjects}
+          onChange={(e) =>
+            setSelectedProjects(
+              Array.from(e.target.selectedOptions, (option) => option.value)
+            )
+          }
+          multiple={false}
+        >
+          <option value="">Select projects</option>
+          {Object.entries(projectIdToNameMap || {}).map(([id, name]) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="bg-gray-800 text-white p-2 rounded w-48"
+          value={selectedDueDates}
+          onChange={(e) =>
+            setSelectedDueDates(
+              Array.from(e.target.selectedOptions, (option) => option.value)
+            )
+          }
+          multiple={false}
+        >
+          <option value="">Select due dates</option>
+          <option value="today">Today</option>
+          <option value="today_and_past">Today and Past</option>
+          <option value="all">All</option>
+        </select>
+      </div>
+
+      <div className="grid grid-cols-5 gap-4">
         {columns.map((column, index) => (
-          <div key={index} className="mx-1">
+          <div key={index} className="bg-gray-800 rounded-lg p-4">
+            <h2 className="text-xl font-bold mb-4 text-white">
+              {columnNames[index]}
+            </h2>
             {column.map((taskId) => {
               const task = todoListSubtasks?.find((t) => t.id === taskId);
               return task ? (
-                <Card
-                  ref={(el) => taskRefs.set(task.id, el)}
-                  className={`max-w-sm mycard ${
-                    task.id === selectedTaskId ? "selected" : ""
-                  }`}
-                  style={{
-                    padding: "16px",
-                    color: "#e0e0e0", // Ensure text is visible on dark background
-                    backgroundColor: "#12161a", // Add this line for a dark background
-                  }}
+                <div
                   key={task.id}
+                  ref={(el) => taskRefs.set(task.id, el)}
+                  className={`bg-gray-700 rounded-lg p-4 mb-4 cursor-pointer transition-all duration-200 ${
+                    task.id === selectedTaskId ? "ring-2 ring-blue-500" : ""
+                  }`}
                   onClick={() => {
                     setSelectedTaskId(task.id);
                     setSearchResultIndex(null);
                   }}
                 >
-                  <Flex direction="column" gap="2">
-                    <Text
-                      as="div"
-                      size="3"
-                      weight="bold"
-                      style={{ marginBottom: "4px", color: "#ffffff" }}
-                    >
-                      {todoParentSet?.has(task.id) ? (
-                        <Link
-                          to={`${task.id}`}
-                          className="text-blue-300 hover:text-blue-200 transition-colors duration-200"
-                        >
-                          {task.content}
-                        </Link>
-                      ) : (
-                        <>{task.content}</>
-                      )}
-                      <a
-                        href={task.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block ml-2 opacity-50 hover:opacity-100 transition-opacity duration-200"
+                  <h3 className="text-lg font-semibold mb-2 text-white">
+                    {todoParentSet?.has(task.id) ? (
+                      <Link
+                        to={`${task.id}`}
+                        className="text-blue-300 hover:text-blue-200 transition-colors duration-200"
                       >
-                        <img
-                          src="/todoist-kanban-vim/open-icon.svg"
-                          alt="Open"
-                          style={{ width: "12px", height: "12px" }}
-                        />
-                      </a>
-                    </Text>
-                    <Text as="div" size="1" style={{ color: "#a0a0a0" }}>
-                      {projectIdToNameMap?.[task.projectId]}
-                    </Text>
-                    {task.due && (
-                      <Text
-                        as="div"
-                        size="1"
-                        style={{
-                          color:
-                            new Date(task.due.datetime || task.due.date) <
-                            new Date()
-                              ? "#ff6b6b"
-                              : "#a0a0a0",
-                        }}
-                      >
-                        {task.due.datetime
-                          ? new Date(task.due.datetime).toLocaleString()
-                          : new Date(task.due.date).toLocaleDateString()}
-                      </Text>
+                        {task.content}
+                      </Link>
+                    ) : (
+                      task.content
                     )}
-                  </Flex>
-                </Card>
+                    <a
+                      href={task.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block ml-2 opacity-50 hover:opacity-100 transition-opacity duration-200"
+                    >
+                      <img
+                        src="/todoist-kanban-vim/open-icon.svg"
+                        alt="Open"
+                        className="w-4 h-4"
+                      />
+                    </a>
+                  </h3>
+                  <p className="text-sm text-gray-400 mb-1">
+                    {projectIdToNameMap?.[task.projectId]}
+                  </p>
+                  {task.due && (
+                    <p
+                      className={`text-sm ${
+                        new Date(task.due.datetime || task.due.date) <
+                        new Date()
+                          ? "text-red-400"
+                          : "text-gray-400"
+                      }`}
+                    >
+                      {task.due.datetime
+                        ? new Date(task.due.datetime).toLocaleString()
+                        : new Date(task.due.date).toLocaleDateString()}
+                    </p>
+                  )}
+                </div>
               ) : null;
             })}
           </div>
         ))}
       </div>
-    </>
+    </div>
   );
 };

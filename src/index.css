@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   color-scheme: dark;
   background-color: #1a1a2e;
   color: #e0e0e0;
@@ -29,4 +29,4 @@
 .mycard.selected {
   background-color: #34495e;
   border-color: #3498db;
-}
+} */
