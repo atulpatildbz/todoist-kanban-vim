@@ -17,7 +17,7 @@ import {
 } from "../hooks/todoHook";
 import { Link, useNavigate } from "react-router-dom";
 import { useProjectIdToNameMap } from "../hooks/projectHook";
-import { Box, Card, Flex, Text } from "@radix-ui/themes";
+import { Card, Flex, Text } from "@radix-ui/themes";
 import { useQueryClient } from "@tanstack/react-query";
 import { TODO_KEY } from "../constants/queryKeys";
 import { Task } from "@doist/todoist-api-typescript";
@@ -344,59 +344,66 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                     task.id === selectedTaskId ? "selected" : ""
                   }`}
                   style={{
-                    padding: "5px",
+                    padding: "16px",
+                    color: "#e0e0e0", // Ensure text is visible on dark background
+                    backgroundColor: "#12161a", // Add this line for a dark background
                   }}
                   key={task.id}
-                  variant="classic"
                   onClick={() => {
                     setSelectedTaskId(task.id);
                     setSearchResultIndex(null);
                   }}
                 >
-                  <Flex gap="3" align="center">
-                    <Box>
-                      <Text as="div" size="2" weight="bold">
-                        {todoParentSet?.has(task.id) ? (
-                          <Link
-                            to={`${task.id}`}
-                            className="text-blue-500 hover:underline"
-                          >
-                            {task.content}
-                          </Link>
-                        ) : (
-                          <>{task.content}</>
-                        )}
-                        <a
-                          href={task.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{ display: "inline-block", marginLeft: "5px" }}
+                  <Flex direction="column" gap="2">
+                    <Text
+                      as="div"
+                      size="3"
+                      weight="bold"
+                      style={{ marginBottom: "4px", color: "#ffffff" }}
+                    >
+                      {todoParentSet?.has(task.id) ? (
+                        <Link
+                          to={`${task.id}`}
+                          className="text-blue-300 hover:text-blue-200 transition-colors duration-200"
                         >
-                          <img
-                            src="/todoist-kanban-vim/open-icon.svg"
-                            alt="Open"
-                            style={{ width: "10px", height: "10px" }}
-                          />
-                        </a>
-                      </Text>
-                      <div className="text-gray-400 text-sm">
-                        {projectIdToNameMap?.[task.projectId]}
-                      </div>
-                      {task.due && (
-                        <div
-                          className={`text-sm ${
+                          {task.content}
+                        </Link>
+                      ) : (
+                        <>{task.content}</>
+                      )}
+                      <a
+                        href={task.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block ml-2 opacity-50 hover:opacity-100 transition-opacity duration-200"
+                      >
+                        <img
+                          src="/todoist-kanban-vim/open-icon.svg"
+                          alt="Open"
+                          style={{ width: "12px", height: "12px" }}
+                        />
+                      </a>
+                    </Text>
+                    <Text as="div" size="1" style={{ color: "#a0a0a0" }}>
+                      {projectIdToNameMap?.[task.projectId]}
+                    </Text>
+                    {task.due && (
+                      <Text
+                        as="div"
+                        size="1"
+                        style={{
+                          color:
                             new Date(task.due.datetime || task.due.date) <
                             new Date()
-                              ? "text-red-400"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {task.due.datetime
-                            ? new Date(task.due.datetime).toLocaleString()
-                            : new Date(task.due.date).toLocaleDateString()}
-                        </div>
-                      )}
-                    </Box>
+                              ? "#ff6b6b"
+                              : "#a0a0a0",
+                        }}
+                      >
+                        {task.due.datetime
+                          ? new Date(task.due.datetime).toLocaleString()
+                          : new Date(task.due.date).toLocaleDateString()}
+                      </Text>
+                    )}
                   </Flex>
                 </Card>
               ) : null;
