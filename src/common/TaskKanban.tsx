@@ -405,7 +405,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                     setSearchResultIndex(null);
                   }}
                 >
-                  <h3 className="text-lg font-semibold mb-2 text-white">
+                  <h2 className="font-semibold mb-2 text-white">
                     {todoParentSet?.has(task.id) ? (
                       <Link
                         to={`todos/${task.id}`}
@@ -428,7 +428,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                         className="w-4 h-4"
                       />
                     </a>
-                  </h3>
+                  </h2>
                   <p className="text-sm text-gray-400 mb-1">
                     {projectIdToNameMap?.[task.projectId]}
                   </p>
