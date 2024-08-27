@@ -73,7 +73,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     useProjectIdToNameMap(api);
 
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
-  const [selectedDueDates, setSelectedDueDates] = useState<string[]>([]);
+  const [selectedDueDates, setSelectedDueDates] = useState<string[]>([
+    "today_and_past",
+  ]);
 
   const sortedTasks = useMemo(() => {
     return [...(todoListSubtasks || [])].sort((a, b) => {
@@ -112,13 +114,15 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
     return sortedTasks?.filter((task) => {
       const projectFilter =
         selectedProjects.length === 0 ||
+        selectedProjects.includes("allProjects") ||
         selectedProjects.includes(task.projectId);
 
       const dueDateFilter =
         selectedDueDates.length === 0 ||
+        selectedDueDates.includes("allDueDates") ||
         selectedDueDates.some((filter) => {
           const today = new Date();
-          today.setHours(0, 0, 0, 0);
+          today.setHours(23, 59, 59, 999);
           const taskDueDate = task.due
             ? new Date(task.due.datetime || task.due.date)
             : null;
@@ -360,7 +364,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
           }
           multiple={false}
         >
-          <option value="">Select projects</option>
+          <option value="allProjects">All Projects</option>
           {Object.entries(projectIdToNameMap || {}).map(([id, name]) => (
             <option key={id} value={id}>
               {name}
@@ -378,10 +382,9 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
           }
           multiple={false}
         >
-          <option value="">Select due dates</option>
+          <option value="allDueDates">All Due Dates</option>
           <option value="today">Today</option>
           <option value="today_and_past">Today and Past</option>
-          <option value="all">All</option>
         </select>
       </div>
 
