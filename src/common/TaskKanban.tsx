@@ -17,9 +17,14 @@ import {
 } from "../hooks/todoHook";
 import { Link, useNavigate } from "react-router-dom";
 import { useProjectIdToNameMap } from "../hooks/projectHook";
-import { useQueryClient } from "@tanstack/react-query";
+import {
+  useIsFetching,
+  useIsMutating,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { TODO_KEY } from "../constants/queryKeys";
 import { Task } from "@doist/todoist-api-typescript";
+import { Spinner } from "./Spinner";
 
 const KANBAN_TODO = "KANBAN_TODO";
 const KANBAN_BLOCKED = "KANBAN_BLOCKED";
@@ -48,6 +53,9 @@ let previousKey: string | null = null;
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const isFetchingCount = useIsFetching();
+  const isMutatingCount = useIsMutating();
 
   const taskRefs = useRef(new Map()).current;
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
@@ -348,50 +356,58 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   }, [selectedTaskId, taskRefs, searchText, searchResultIndex]);
 
   if (isLoading || isLoadingProject) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-gray-900">
-      <div className="mb-4 flex space-x-4">
-        <select
-          className="bg-gray-800 text-white p-2 rounded w-48"
-          value={selectedProjects}
-          onChange={(e) =>
-            setSelectedProjects(
-              Array.from(e.target.selectedOptions, (option) => option.value)
-            )
-          }
-          multiple={false}
-        >
-          <option value="allProjects">All Projects</option>
-          {Object.entries(projectIdToNameMap || {}).map(([id, name]) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
-        </select>
+    <div className="p-6">
+      <div className="mb-6 flex space-x-4 items-center justify-between">
+        <div className="flex space-x-4">
+          <select
+            className="bg-gray-800 text-white p-2 rounded w-48 text-sm"
+            value={selectedProjects}
+            onChange={(e) =>
+              setSelectedProjects(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
+            }
+            multiple={false}
+          >
+            <option value="allProjects">All Projects</option>
+            {Object.entries(projectIdToNameMap || {}).map(([id, name]) => (
+              <option key={id} value={id}>
+                {name}
+              </option>
+            ))}
+          </select>
 
-        <select
-          className="bg-gray-800 text-white p-2 rounded w-48"
-          value={selectedDueDates}
-          onChange={(e) =>
-            setSelectedDueDates(
-              Array.from(e.target.selectedOptions, (option) => option.value)
-            )
-          }
-          multiple={false}
-        >
-          <option value="allDueDates">All Due Dates</option>
-          <option value="today">Today</option>
-          <option value="today_and_past">Today and Past</option>
-        </select>
+          <select
+            className="bg-gray-800 text-white p-2 rounded w-48 text-sm"
+            value={selectedDueDates}
+            onChange={(e) =>
+              setSelectedDueDates(
+                Array.from(e.target.selectedOptions, (option) => option.value)
+              )
+            }
+            multiple={false}
+          >
+            <option value="allDueDates">All Due Dates</option>
+            <option value="today">Today</option>
+            <option value="today_and_past">Today and Past</option>
+          </select>
+        </div>
+
+        {(isFetchingCount > 0 || isMutatingCount > 0) && <Spinner />}
       </div>
 
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-5 gap-6">
         {columns.map((column, index) => (
-          <div key={index} className="bg-gray-800 rounded-lg p-4">
-            <h2 className="text-xl font-bold mb-4 text-white">
+          <div key={index} className="bg-gray-800 rounded-lg p-4 shadow-lg">
+            <h2 className="text-lg font-bold mb-4 text-white border-b border-gray-700 pb-2">
               {columnNames[index]}
             </h2>
             {column.map((taskId) => {
@@ -400,7 +416,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                 <div
                   key={task.id}
                   ref={(el) => taskRefs.set(task.id, el)}
-                  className={`bg-gray-700 rounded-lg p-4 mb-4 cursor-pointer transition-all duration-200 ${
+                  className={`bg-gray-700 rounded-lg p-3 mb-3 cursor-pointer transition-all duration-200 hover:bg-gray-600 ${
                     task.id === selectedTaskId ? "ring-2 ring-blue-500" : ""
                   }`}
                   onClick={() => {
@@ -408,7 +424,7 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                     setSearchResultIndex(null);
                   }}
                 >
-                  <h2 className="font-semibold mb-2 text-white">
+                  <h2 className="font-semibold mb-2 text-white text-sm">
                     {todoParentSet?.has(task.id) ? (
                       <Link
                         to={`todos/${task.id}`}
@@ -428,27 +444,27 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                       <img
                         src="/todoist-kanban-vim/open-icon.svg"
                         alt="Open"
-                        className="w-4 h-4"
+                        className="w-3 h-3"
                       />
                     </a>
                   </h2>
-                  <p className="text-sm text-gray-400 mb-1">
-                    {projectIdToNameMap?.[task.projectId]}
-                  </p>
-                  {task.due && (
-                    <p
-                      className={`text-sm ${
-                        new Date(task.due.datetime || task.due.date) <
-                        new Date()
-                          ? "text-red-400"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {task.due.datetime
-                        ? new Date(task.due.datetime).toLocaleString()
-                        : new Date(task.due.date).toLocaleDateString()}
-                    </p>
-                  )}
+                  <div className="flex justify-between items-center text-xs text-gray-400">
+                    <span>{projectIdToNameMap?.[task.projectId]}</span>
+                    {task.due && (
+                      <span
+                        className={
+                          new Date(task.due.datetime || task.due.date) <
+                          new Date()
+                            ? "text-red-400"
+                            : ""
+                        }
+                      >
+                        {task.due.datetime
+                          ? new Date(task.due.datetime).toLocaleString()
+                          : new Date(task.due.date).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
               ) : null;
             })}
