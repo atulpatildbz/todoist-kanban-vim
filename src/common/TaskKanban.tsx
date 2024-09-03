@@ -215,13 +215,13 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   };
 
   const debouncedMutate = useDebounce(
-    (selectedTaskId: string, newLabel: string) => {
+    (selectedTaskId: string, newLabels: string[]) => {
       updateTodo.mutate({
         id: selectedTaskId,
-        data: { labels: newLabel === "" ? [] : [newLabel] },
+        data: { labels: newLabels },
       });
     },
-    300
+    500
   );
 
   const setNewKanbanIndex = useCallback(
@@ -229,20 +229,34 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
       if (selectedTaskId === null) return;
       const newLabel = INDEX_TO_LABEL_MAP[newLabelIndex];
 
+      const existingTask = sortedTasks?.find(
+        (task) => task.id === selectedTaskId
+      );
+      let oldLabels = existingTask?.labels || [];
+      console.info("AtulLog: oldLabels1 : ", oldLabels);
+
+      oldLabels = oldLabels.filter(
+        (label) => !INDEX_TO_LABEL_MAP.includes(label)
+      );
+      console.info("AtulLog: oldLabels2 : ", oldLabels);
+
+      const newLabels = newLabel === "" ? oldLabels : [...oldLabels, newLabel];
+      console.info("AtulLog: newLabels: ", newLabels);
+
       // Immediately set the query data
       queryClient.setQueryData([TODO_KEY], (todos: Task[]) => {
         return todos.map((todo) => {
           if (todo.id === selectedTaskId) {
-            return { ...todo, labels: newLabel === "" ? [] : [newLabel] };
+            return { ...todo, labels: newLabels };
           }
           return todo;
         });
       });
 
       // Debounced mutate call
-      debouncedMutate(selectedTaskId, newLabel);
+      debouncedMutate(selectedTaskId, newLabels);
     },
-    [selectedTaskId, queryClient, debouncedMutate]
+    [selectedTaskId, queryClient, debouncedMutate, sortedTasks]
   );
 
   const moveCard = useCallback(
