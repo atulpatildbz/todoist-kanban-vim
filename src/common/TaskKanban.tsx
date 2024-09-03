@@ -233,15 +233,12 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
         (task) => task.id === selectedTaskId
       );
       let oldLabels = existingTask?.labels || [];
-      console.info("AtulLog: oldLabels1 : ", oldLabels);
 
       oldLabels = oldLabels.filter(
         (label) => !INDEX_TO_LABEL_MAP.includes(label)
       );
-      console.info("AtulLog: oldLabels2 : ", oldLabels);
 
       const newLabels = newLabel === "" ? oldLabels : [...oldLabels, newLabel];
-      console.info("AtulLog: newLabels: ", newLabels);
 
       // Immediately set the query data
       queryClient.setQueryData([TODO_KEY], (todos: Task[]) => {
