@@ -482,7 +482,10 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                     })}
                   </div>
                   <div className="flex justify-between items-center text-xs text-gray-400">
-                    <span>{projectIdToNameMap?.[task.projectId]}</span>
+                    {selectedProjects.includes("allProjects") ||
+                    selectedProjects.length === 0 ? (
+                      <span>{projectIdToNameMap?.[task.projectId]}</span>
+                    ) : null}
                     {task.due && (
                       <span
                         className={
