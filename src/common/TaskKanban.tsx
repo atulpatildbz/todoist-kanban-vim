@@ -43,6 +43,8 @@ type Direction = "left" | "right";
 
 let previousKey: string | null = null;
 
+const labelColors: Record<string, string> = {};
+
 export const TaskKanban = ({ parentId }: { parentId?: string }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -452,6 +454,33 @@ export const TaskKanban = ({ parentId }: { parentId?: string }) => {
                       />
                     </a>
                   </h2>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {task.labels.map((label) => {
+                      if (INDEX_TO_LABEL_MAP.includes(label)) return;
+
+                      if (!(label in labelColors)) {
+                        // Generate random values for RGB, but limit the range to darker tones
+                        const r = Math.floor(Math.random() * 100);
+                        const g = Math.floor(Math.random() * 100);
+                        const b = Math.floor(Math.random() * 100);
+                        labelColors[label] = `#${r
+                          .toString(16)
+                          .padStart(2, "0")}${g
+                          .toString(16)
+                          .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+                      }
+                      return (
+                        <span
+                          key={label}
+                          className={`px-2 py-1 rounded-full text-xs font-semibold text-white
+                          ${labelColors[label]} bg-opacity-80`}
+                          style={{ backgroundColor: labelColors[label] }}
+                        >
+                          {label}
+                        </span>
+                      );
+                    })}
+                  </div>
                   <div className="flex justify-between items-center text-xs text-gray-400">
                     <span>{projectIdToNameMap?.[task.projectId]}</span>
                     {task.due && (
