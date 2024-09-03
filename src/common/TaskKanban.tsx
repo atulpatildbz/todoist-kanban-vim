@@ -25,28 +25,21 @@ import {
 import { TODO_KEY } from "../constants/queryKeys";
 import { Task } from "@doist/todoist-api-typescript";
 import { Spinner } from "./Spinner";
-
-const KANBAN_TODO = "KANBAN_TODO";
-const KANBAN_BLOCKED = "KANBAN_BLOCKED";
-const KANBAN_IN_PROGRESS = "KANBAN_IN_PROGRESS";
-const KANBAN_DONE = "KANBAN_DONE";
-
-const NO_LABEL = 0;
-const TODO = 1;
-const BLOCKED = 2;
-const IN_PROGRESS = 3;
-const DONE = 4;
-
-const INDEX_TO_LABEL_MAP = [
-  "",
-  KANBAN_TODO,
+import {
+  BLOCKED,
+  columnNames,
+  DONE,
+  IN_PROGRESS,
+  INDEX_TO_LABEL_MAP,
   KANBAN_BLOCKED,
-  KANBAN_IN_PROGRESS,
   KANBAN_DONE,
-];
+  KANBAN_IN_PROGRESS,
+  KANBAN_TODO,
+  NO_LABEL,
+  TODO,
+} from "../constants/constants";
 
 type Direction = "left" | "right";
-const columnNames = ["Not Set", "Todo", "Blocked", "In Progress", "Done"];
 
 let previousKey: string | null = null;
 
